@@ -1,5 +1,7 @@
 #include <Arduino.h>
+#if defined NRF52_SERIES
 #include <Adafruit_TinyUSB.h>
+#endif
 #include <SX126x-RAK4630.h>
 #include <qrcode.h>
 // https://github.com/ricmoo/qrcode/
@@ -7,17 +9,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_EPD.h>
 #include "images.h"
-
-#define POWER_ENABLE   WB_IO2
-#define EPD_MOSI       MOSI
-#define EPD_MISO       -1 // not used
-#define EPD_SCK        SCK
-#define EPD_CS         SS
-#define EPD_DC         WB_IO1
-#define SRAM_CS        -1 // not used
-#define EPD_RESET      -1 // not used
-#define EPD_BUSY       WB_IO4
-Adafruit_SSD1680 display(250, 122, EPD_MOSI, EPD_SCK, EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_MISO, EPD_BUSY);
+#include "Format.h"
 
 // LoRa
 static RadioEvents_t RadioEvents;
@@ -45,10 +37,19 @@ void OnRxTimeout(void) {
 }
 
 void OnRxError(void) {
-  digitalWrite(LED_BLUE, HIGH);
   Serial.println("Rx Error!");
-  delay(500);
+  digitalWrite(LED_BLUE, HIGH);
+  delay(200);
   digitalWrite(LED_BLUE, LOW);
+  delay(200);
+  digitalWrite(LED_BLUE, HIGH);
+  delay(200);
+  digitalWrite(LED_BLUE, LOW);
+  delay(200);
+  digitalWrite(LED_BLUE, HIGH);
+  delay(200);
+  digitalWrite(LED_BLUE, LOW);
+  delay(200);
   Radio.Rx(RX_TIMEOUT_VALUE);
 }
 
@@ -70,9 +71,6 @@ uint8_t version = 3;
 
 void showQRCode(char *msg) {
   display.clearBuffer();
-  display.drawBitmap(192, 60, rak_img, 150, 56, EPD_BLACK);
-  display.drawBitmap(190, 0, lora_img, 60, 40, EPD_BLACK);
-  display.display(true);
   uint16_t sz = qrcode_getBufferSize(version);
   uint8_t qrcodeData[sz];
   qrcode_initText(&qrcode, qrcodeData, version, 0, msg);
@@ -129,14 +127,41 @@ void setup() {
       break;
     }
   }
+  Serial.println("=====================================");
+  Serial.println("        QR Code EPD LoRa Test");
+  Serial.println("=====================================");
+  pinMode(WB_IO2, OUTPUT);
+  digitalWrite(WB_IO2, HIGH); // power on for AT24C02 device
+  delay(300);
+  Serial.println("Power on.............");
+  if (i2ceeprom.begin(EEPROM_ADDR)) {
+    // you can stick the new i2c addr in here, e.g. begin(0x51);
+    Serial.println("Found I2C EEPROM");
+  } else {
+    Serial.println("I2C EEPROM not identified ... check your connections?\r\n");
+    while (1) {
+      delay(10);
+    }
+  }
+#ifdef _INITIALIZE_
+  initEEPROM();
+#endif
+  readEEPROM();
   Serial.println("Epaper-QRCode test");
   display.begin();
-  showQRCode("Hello World!");
+  showQRCode("HENLO!");
+  display.drawBitmap(192, 0, rak_img, 150, 56, EPD_BLACK);
+  testdrawtext(200, 60, myName, EPD_BLACK, 2);
+  display.display(true);
   Serial.println("=====================================");
   Serial.println("             LoRa Setup");
   Serial.println("=====================================");
   // Initialize the Radio callbacks
+#if defined NRF52_SERIES
   lora_rak4630_init();
+#else
+  lora_rak11300_init();
+#endif
   RadioEvents.TxDone = NULL;
   RadioEvents.RxDone = OnRxDone;
   RadioEvents.TxTimeout = NULL;
@@ -147,7 +172,7 @@ void setup() {
   Radio.Init(&RadioEvents);
   // Set Radio channel
   Radio.SetChannel(RF_FREQUENCY);
-  Serial.println("Freq = " + String(RF_FREQUENCY) + " MHz");
+  Serial.println("Freq = " + String(RF_FREQUENCY / 1e6) + " MHz");
   Serial.println("SF = " + String(LORA_SPREADING_FACTOR));
   Serial.println("BW = " + String(LORA_BANDWIDTH) + " KHz");
   Serial.println("CR = 4/" + String(LORA_CODINGRATE));
