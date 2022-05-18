@@ -5,14 +5,14 @@
 #define MAXADD 262143 // max address in byte
 Adafruit_EEPROM_I2C i2ceeprom;
 
-#define EPD_MOSI     MOSI
-#define EPD_MISO     -1 // not used
-#define EPD_SCK      SCK
-#define EPD_CS       SS
-#define EPD_DC       WB_IO1
-#define SRAM_CS      -1 // not used
-#define EPD_RESET    -1 // not used
-#define EPD_BUSY     WB_IO4
+#define EPD_MOSI  MOSI
+#define EPD_MISO  -1 // not used
+#define EPD_SCK   SCK
+#define EPD_CS    SS
+#define EPD_DC    WB_IO1
+#define SRAM_CS   -1 // not used
+#define EPD_RESET -1 // not used
+#define EPD_BUSY  WB_IO4
 Adafruit_SSD1680 display(250, 122, EPD_MOSI, EPD_SCK, EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_MISO, EPD_BUSY);
 
 char myUUID[8] = {0};
@@ -43,7 +43,7 @@ void testdrawtext(int16_t x, int16_t y, char *text, uint16_t text_color, uint32_
   display.print(text);
 }
 
-void hexDump(unsigned char *buf, uint16_t len) {
+void hexDump(char *buf, uint16_t len) {
   char alphabet[17] = "0123456789abcdef";
   Serial.print(F("   +------------------------------------------------+ +----------------+\n"));
   Serial.print(F("   |.0 .1 .2 .3 .4 .5 .6 .7 .8 .9 .a .b .c .d .e .f | |      ASCII     |\n"));
