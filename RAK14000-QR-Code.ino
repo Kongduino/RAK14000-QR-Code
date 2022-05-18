@@ -15,7 +15,7 @@ void showQRCode(char *, boolean);
 // LoRa
 static RadioEvents_t RadioEvents;
 // Define LoRa parameters
-#define RF_FREQUENCY 915000000 // Hz
+#define RF_FREQUENCY 868000000 // Hz
 #define TX_OUTPUT_POWER 22 // dBm
 #define LORA_BANDWIDTH 0 // [0: 125 kHz, 1: 250 kHz, 2: 500 kHz, 3: Reserved]
 #define LORA_SPREADING_FACTOR 10 // [SF7..SF12]
@@ -28,7 +28,7 @@ static RadioEvents_t RadioEvents;
 #define TX_TIMEOUT_VALUE 3000
 
 char buffer[256];
-#define BUZZER_CONTROL WB_IO3
+// #define BUZZER_CONTROL WB_IO3
 
 void OnRxTimeout(void) {
   digitalWrite(LED_BLUE, HIGH);
@@ -86,13 +86,13 @@ void OnRxDone(uint8_t *payload, uint16_t ix, int16_t rssi, int8_t snr) {
   cp0 = strcmp(myPlainTextUUID, UUID);
   cp1 = strcmp("*", UUID);
   if (cp0 == 0 || cp1 == 0) {
-    tone(BUZZER_CONTROL, 393);
-    delay(300);
-    noTone(BUZZER_CONTROL);
-    delay(300);
-    tone(BUZZER_CONTROL, 393);
-    delay(300);
-    noTone(BUZZER_CONTROL);
+//    tone(BUZZER_CONTROL, 393);
+//    delay(300);
+//    noTone(BUZZER_CONTROL);
+//    delay(300);
+//    tone(BUZZER_CONTROL, 393);
+//    delay(300);
+//    noTone(BUZZER_CONTROL);
     const char* msg = doc["msg"];
     sprintf(buffer, "Message: %s", msg);
     Serial.println(buffer);
@@ -177,8 +177,8 @@ void setup() {
   pinMode(WB_IO6, INPUT_PULLUP);
   digitalWrite(WB_IO6, HIGH);
   delay(300);
-  pinMode(BUZZER_CONTROL, OUTPUT);
-  delay(300);
+  // pinMode(BUZZER_CONTROL, OUTPUT);
+  // delay(300);
   Serial.println(F("====================================="));
   if (i2ceeprom.begin(EEPROM_ADDR)) {
     // you can put a different I2C address here, e.g. begin(0x51);
