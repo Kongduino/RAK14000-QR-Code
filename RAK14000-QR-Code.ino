@@ -174,9 +174,9 @@ void setup() {
   pinMode(WB_IO2, INPUT_PULLUP); // EPD
   digitalWrite(WB_IO2, HIGH);
   delay(300);
-  pinMode(WB_IO6, INPUT_PULLUP);
-  digitalWrite(WB_IO6, HIGH);
-  delay(300);
+//  pinMode(WB_IO6, INPUT_PULLUP);
+//  digitalWrite(WB_IO6, HIGH);
+//  delay(300);
   // pinMode(BUZZER_CONTROL, OUTPUT);
   // delay(300);
   Serial.println(F("====================================="));
