@@ -86,13 +86,13 @@ void OnRxDone(uint8_t *payload, uint16_t ix, int16_t rssi, int8_t snr) {
   cp0 = strcmp(myPlainTextUUID, UUID);
   cp1 = strcmp("*", UUID);
   if (cp0 == 0 || cp1 == 0) {
-//    tone(BUZZER_CONTROL, 393);
-//    delay(300);
-//    noTone(BUZZER_CONTROL);
-//    delay(300);
-//    tone(BUZZER_CONTROL, 393);
-//    delay(300);
-//    noTone(BUZZER_CONTROL);
+    // tone(BUZZER_CONTROL, 393);
+    // delay(300);
+    // noTone(BUZZER_CONTROL);
+    // delay(300);
+    // tone(BUZZER_CONTROL, 393);
+    // delay(300);
+    // noTone(BUZZER_CONTROL);
     const char* msg = doc["msg"];
     sprintf(buffer, "Message: %s", msg);
     Serial.println(buffer);
@@ -100,7 +100,7 @@ void OnRxDone(uint8_t *payload, uint16_t ix, int16_t rssi, int8_t snr) {
     display.drawBitmap(192, 0, rak_img, 150, 56, EPD_BLACK);
     testdrawtext(125, 100, (char*)msg, EPD_BLACK, 1);
     display.display(true);
-  } // else Serial.println(" --> Not for me!");
+  } else Serial.println(" --> Not for me!");
   digitalWrite(LED_GREEN, LOW); // Turn off Green LED
   Radio.Rx(RX_TIMEOUT_VALUE);
 }
@@ -189,6 +189,9 @@ void setup() {
       delay(10);
     }
   }
+#ifdef _INITIALIZE_
+  initEEPROM();
+#endif
   readEEPROM();
   Serial.println("Epaper-QRCode test");
   display.begin();

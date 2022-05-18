@@ -1,9 +1,16 @@
+// Uncomment if you want to initialize the EEPROM
+#define _INITIALIZE_
+// Uncomment if you want to use the EEPROM
+#define _USE_EEPROM_
+
+#ifdef _USE_EEPROM_
 #include <Wire.h>
 #include "Adafruit_EEPROM_I2C.h" // Click here to get the library: http://librarymanager/All#Adafruit_EEPROM_I2C
 
 #define EEPROM_ADDR 0x50 // the default address
 #define MAXADD 262143 // max address in byte
 Adafruit_EEPROM_I2C i2ceeprom;
+#endif
 
 #define EPD_MOSI  MOSI
 #define EPD_MISO  -1 // not used
@@ -15,10 +22,20 @@ Adafruit_EEPROM_I2C i2ceeprom;
 #define EPD_BUSY  WB_IO4
 Adafruit_SSD1680 display(250, 122, EPD_MOSI, EPD_SCK, EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_MISO, EPD_BUSY);
 
-char myUUID[8] = {0};
-char myPlainTextUUID[17] = {0};
+char myUUID[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+char myPlainTextUUID[17] = "0102030405060708";
 
 void hexDump(char *, uint16_t);
+
+#ifdef _USE_EEPROM_
+#ifdef _INITIALIZE_
+void initEEPROM() {
+  uint16_t addr = 0x0000;
+  // Set a name here if your want, max 8 bytes
+  uint16_t num = i2ceeprom.writeObject(addr, myUUID);
+  Serial.println("Wrote myUUID: " + String(num) + " bytes");
+}
+#endif
 
 void readEEPROM() {
   uint16_t addr = 0x0000;
@@ -26,6 +43,7 @@ void readEEPROM() {
   Serial.println("myUUID:");
   hexDump(myUUID, 8);
 }
+#endif
 
 /**
    @brief Write a text on the display
