@@ -1,3 +1,8 @@
+#include "ble_gap.h"
+#include <bluefruit.h>
+
+BLEUart g_BleUart;
+
 // Uncomment if you want to initialize the EEPROM
 #define _INITIALIZE_
 // Uncomment if you want to use the EEPROM
@@ -22,14 +27,24 @@ Adafruit_EEPROM_I2C i2ceeprom;
 #define EPD_BUSY  WB_IO4
 Adafruit_SSD1680 display(250, 122, EPD_MOSI, EPD_SCK, EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_MISO, EPD_BUSY);
 
-char myUUID[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
-char myPlainTextUUID[17] = "0102030405060708";
+char myUUID[5] = {'_'};
+char myPlainTextUUID[11] = "0102030405060708";
 
 void hexDump(char *, uint16_t);
 
 #ifdef _USE_EEPROM_
 #ifdef _INITIALIZE_
 void initEEPROM() {
+  ble_gap_addr_t ble_addr;
+  sd_ble_gap_addr_get(&ble_addr);
+  uint8_t px = 1, py = 3, ix;
+  myUUID[1] = ble_addr.addr[2];
+  myUUID[2] = ble_addr.addr[1];
+  myUUID[3] = ble_addr.addr[0];
+  Serial.printf(
+    "UUID: %02x %02x %02x %02x %02x %02x %02x %02x\n",
+    myUUID[0], myUUID[1], myUUID[2], myUUID[3], myUUID[4], myUUID[5], myUUID[6], myUUID[7]
+  );
   uint16_t addr = 0x0000;
   // Set a name here if your want, max 8 bytes
   uint16_t num = i2ceeprom.writeObject(addr, myUUID);
