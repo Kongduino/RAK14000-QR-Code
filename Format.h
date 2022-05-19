@@ -28,7 +28,7 @@ Adafruit_EEPROM_I2C i2ceeprom;
 Adafruit_SSD1680 display(250, 122, EPD_MOSI, EPD_SCK, EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_MISO, EPD_BUSY);
 
 char myUUID[5] = {'_'};
-char myPlainTextUUID[11] = "0102030405060708";
+char myPlainTextUUID[11];
 
 void hexDump(char *, uint16_t);
 
