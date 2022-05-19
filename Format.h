@@ -1,10 +1,6 @@
-#include "ble_gap.h"
-#include <bluefruit.h>
-
-BLEUart g_BleUart;
-
+#include "Adafruit_nRFCrypto.h"
 // Uncomment if you want to initialize the EEPROM
-#define _INITIALIZE_
+//#define _INITIALIZE_
 // Uncomment if you want to use the EEPROM
 #define _USE_EEPROM_
 
@@ -17,46 +13,42 @@ BLEUart g_BleUart;
 Adafruit_EEPROM_I2C i2ceeprom;
 #endif
 
-#define EPD_MOSI  MOSI
-#define EPD_MISO  -1 // not used
-#define EPD_SCK   SCK
-#define EPD_CS    SS
-#define EPD_DC    WB_IO1
-#define SRAM_CS   -1 // not used
+#define EPD_MOSI MOSI
+#define EPD_MISO -1 // not used
+#define EPD_SCK SCK
+#define EPD_CS SS
+#define EPD_DC WB_IO1
+#define SRAM_CS -1 // not used
 #define EPD_RESET -1 // not used
-#define EPD_BUSY  WB_IO4
+#define EPD_BUSY WB_IO4
 Adafruit_SSD1680 display(250, 122, EPD_MOSI, EPD_SCK, EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_MISO, EPD_BUSY);
 
-char myUUID[5] = {'_'};
-char myPlainTextUUID[11];
+#define UUIDlen 8
+char myUUID[UUIDlen];
+char myPlainTextUUID[UUIDlen * 2 + 2];
 
 void hexDump(char *, uint16_t);
 
 #ifdef _USE_EEPROM_
-#ifdef _INITIALIZE_
+//#ifdef _INITIALIZE_
 void initEEPROM() {
-  ble_gap_addr_t ble_addr;
-  sd_ble_gap_addr_get(&ble_addr);
-  uint8_t px = 1, py = 3, ix;
-  myUUID[1] = ble_addr.addr[2];
-  myUUID[2] = ble_addr.addr[1];
-  myUUID[3] = ble_addr.addr[0];
-  Serial.printf(
-    "UUID: %02x %02x %02x %02x %02x %02x %02x %02x\n",
-    myUUID[0], myUUID[1], myUUID[2], myUUID[3], myUUID[4], myUUID[5], myUUID[6], myUUID[7]
-  );
+  Serial.println("initEEPROM!");
+  nRFCrypto.begin();
+  nRFCrypto.Random.generate((uint8_t*)myUUID, UUIDlen);
+  nRFCrypto.end();
+  hexDump(myUUID, UUIDlen);
   uint16_t addr = 0x0000;
   // Set a name here if your want, max 8 bytes
   uint16_t num = i2ceeprom.writeObject(addr, myUUID);
   Serial.println("Wrote myUUID: " + String(num) + " bytes");
 }
-#endif
+//#endif
 
 void readEEPROM() {
   uint16_t addr = 0x0000;
   i2ceeprom.readObject(addr, myUUID);
   Serial.println("myUUID:");
-  hexDump(myUUID, 8);
+  hexDump(myUUID, UUIDlen);
 }
 #endif
 

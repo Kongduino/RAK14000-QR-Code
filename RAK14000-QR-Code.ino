@@ -189,23 +189,17 @@ void setup() {
       delay(10);
     }
   }
-#ifdef _INITIALIZE_
-  initEEPROM();
-#endif
-  Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
-  Bluefruit.configPrphConn(92, BLE_GAP_EVENT_LENGTH_MIN, 16, 16);
-  Bluefruit.begin(1, 0);
-  // Set max power. Accepted values are: -40, -30, -20, -16, -12, -8, -4, 0, 4
-  Bluefruit.setTxPower(4);
-  // Set the BLE device name
+  pinMode(PIN_SERIAL1_RX, INPUT);
+  if(digitalRead(PIN_SERIAL1_RX) == LOW) initEEPROM();
   readEEPROM();
-  Serial.println("Epaper-QRCode test");
+  Serial.println("Epaper-QRCode test\n======================");
   display.begin();
-  memset(buffer, 0, 256);
+  memset(buffer, 0, 32);
+  memset(myPlainTextUUID, 0, (UUIDlen * 2 + 2));
   strcpy(buffer, "UUID: ");
-  uint8_t addr = 0, ix = 0;
+  uint8_t addr = 6, ix = 1;
   char alphabet[17] = "0123456789ABCDEF";
-  for (uint8_t i = 0; i < 8; i++) {
+  for (uint8_t i = 0; i < UUIDlen; i++) {
     char c = myUUID[i];
     buffer[addr++] = alphabet[c >> 4];
     buffer[addr++] = alphabet[c & 0x0f];
@@ -214,7 +208,6 @@ void setup() {
   }
   uint8_t ln = strlen(buffer);
   hexDump(buffer, ln);
-  Bluefruit.setName(myPlainTextUUID);
   showQRCode(buffer, true);
   display.drawBitmap(192, 0, rak_img, 150, 56, EPD_BLACK);
   testdrawtext(125, 60, buffer + 6, EPD_BLACK, 1);
