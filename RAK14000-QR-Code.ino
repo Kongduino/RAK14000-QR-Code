@@ -80,8 +80,8 @@ void OnRxDone(uint8_t *payload, uint16_t ix, int16_t rssi, int8_t snr) {
     Serial.println("No `to` field!");
     return;
   }
-  // sprintf(buffer, "My UUID  : %s\nRecipient: %s\n", myPlainTextUUID, UUID);
-  // Serial.println(buffer);
+  Serial.printf("My UUID: `%s`\nRecipient: %s\n", myPlainTextUUID, UUID);
+
   uint8_t cp0, cp1;
   cp0 = strcmp(myPlainTextUUID, UUID);
   cp1 = strcmp("*", UUID);
@@ -100,7 +100,7 @@ void OnRxDone(uint8_t *payload, uint16_t ix, int16_t rssi, int8_t snr) {
     display.drawBitmap(192, 0, rak_img, 150, 56, EPD_BLACK);
     testdrawtext(125, 100, (char*)msg, EPD_BLACK, 1);
     display.display(true);
-  } else Serial.println(" --> Not for me!");
+  } else Serial.printf(" --> Not for me! [%s vs %s]", myPlainTextUUID, UUID);
   digitalWrite(LED_GREEN, LOW); // Turn off Green LED
   Radio.Rx(RX_TIMEOUT_VALUE);
 }
@@ -190,14 +190,14 @@ void setup() {
     }
   }
   pinMode(PIN_SERIAL1_RX, INPUT);
-  if(digitalRead(PIN_SERIAL1_RX) == LOW) initEEPROM();
+  if (digitalRead(PIN_SERIAL1_RX) == HIGH) initEEPROM();
   readEEPROM();
   Serial.println("Epaper-QRCode test\n======================");
   display.begin();
   memset(buffer, 0, 32);
   memset(myPlainTextUUID, 0, (UUIDlen * 2 + 2));
   strcpy(buffer, "UUID: ");
-  uint8_t addr = 6, ix = 1;
+  uint8_t addr = 6, ix = 0;
   char alphabet[17] = "0123456789ABCDEF";
   for (uint8_t i = 0; i < UUIDlen; i++) {
     char c = myUUID[i];
@@ -208,6 +208,7 @@ void setup() {
   }
   uint8_t ln = strlen(buffer);
   hexDump(buffer, ln);
+  hexDump(myPlainTextUUID, UUIDlen * 2 + 1);
   showQRCode(buffer, true);
   display.drawBitmap(192, 0, rak_img, 150, 56, EPD_BLACK);
   testdrawtext(125, 60, buffer + 6, EPD_BLACK, 1);
